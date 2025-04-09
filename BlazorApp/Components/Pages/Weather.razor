@@ -1,0 +1,58 @@
+﻿@page "/weather"
+@attribute [StreamRendering]
+
+<PageTitle>Weather</PageTitle>
+
+<h1>Weather</h1>
+
+<p>This component demonstrates showing data.</p>
+
+@if (forecasts == null)
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+}
+else
+{
+<RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+                ColumnWidth="300px" TItem="WeatherForecast" LogicalFilterOperator="LogicalFilterOperator.Or" SelectionMode="DataGridSelectionMode.Single" Data=@forecasts>
+    <Columns>
+        <RadzenDataGridColumn Property="@nameof(WeatherForecast.Id)" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
+        <RadzenDataGridColumn Property="@nameof(WeatherForecast.Date)" Title="Date" Frozen="true" Width="160px" />
+        <RadzenDataGridColumn Property="@nameof(WeatherForecast.TemperatureC)" Title="Temp C" Width="160px"/>
+        <RadzenDataGridColumn Property="@nameof(WeatherForecast.TemperatureF)" Title="Temp F" Width="200px" />
+        <RadzenDataGridColumn Property="@nameof(WeatherForecast.Summary)" Title="Summary" Width="120px" />
+    </Columns>
+</RadzenDataGrid>
+}
+
+@code {
+    private IList<WeatherForecast>? forecasts;
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        var startDate = DateOnly.FromDateTime(DateTime.Now);
+        var summaries = new[] { "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching" };
+        forecasts = Enumerable.Range(1, 5).Select(index => new WeatherForecast
+        {
+            Id = Random.Shared.Next(1, 100),
+            Date = startDate.AddDays(index),
+            TemperatureC = Random.Shared.Next(-20, 55),
+            Summary = summaries[Random.Shared.Next(summaries.Length)]
+        }).ToList();
+        
+        Console.WriteLine($"Forecasts count: {forecasts?.Count}");
+    }
+
+    private class WeatherForecast
+    {
+        public int Id { get; set; }
+        public DateOnly Date { get; set; }
+        public int TemperatureC { get; set; }
+        public string? Summary { get; set; }
+        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+    }
+
+}
